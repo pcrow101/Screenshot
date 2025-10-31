@@ -11,19 +11,21 @@ import Combine
 
 class ScreencaptureViewModel: ObservableObject {
     
+    @AppStorage("playScreenshotSound") private var playScreenshotSound: Bool = true
+    
     enum ScreenshotTypes {
         case full
         case window
         case area
         
-        var processArguments: [String] {
+        func processArguments(playSound: Bool) -> [String] {
             switch self {
                 case .full:
-                    ["-c"]
+                    return playSound ? ["-c"] : ["-cx"]
                 case .window:
-                    ["-cw"]
+                    return playSound ? ["-cw"] : ["-cwx"]
                 case .area:
-                    ["-cs"]
+                    return playSound ? ["-cs"] : ["-csx"]
             }
         }
     }
@@ -48,7 +50,7 @@ class ScreencaptureViewModel: ObservableObject {
     func takeScreenshot(for type: ScreenshotTypes) {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/usr/sbin/screencapture")
-        task.arguments = type.processArguments
+        task.arguments = type.processArguments(playSound: playScreenshotSound)
         
         do {
             try task.run()

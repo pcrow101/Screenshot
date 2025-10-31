@@ -9,10 +9,12 @@ import SwiftUI
 
 struct MenubarSettingsView: View {
     @AppStorage("menuBarExtraIsInserted") var menuBarExtraIsInserted = true
+    @AppStorage("playScreenshotSound") var playScreenshotSound = true
     
     var body: some View {
         Form {
-            Toggle("show menu bar extra", isOn: $menuBarExtraIsInserted)
+            Toggle("Show menu bar extra", isOn: $menuBarExtraIsInserted)
+            Toggle("Play sound on screenshot", isOn: $playScreenshotSound)
         }
     }
 }

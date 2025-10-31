@@ -11,10 +11,10 @@ struct SettingsView: View {
     var body: some View {
         TabView {
             KeyboardShortcutSettingsView()
-                .tabItem { Label("Keyboard", systemImage: "keyboard") }
+                .tabItem { Label("Shortcuts", systemImage: "keyboard") }
             
             MenubarSettingsView()
-                .tabItem { Label("MenuBarExtra", systemImage: "rectangle.topthird.inset.filled") }
+                .tabItem { Label("Options", systemImage: "rectangle.topthird.inset.filled") }
         }
         .frame(minWidth: 400, minHeight: 300)
     }
