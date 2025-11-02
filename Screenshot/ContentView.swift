@@ -10,6 +10,8 @@ import SwiftUI
 struct ContentView: View {
     
     @ObservedObject var vm: ScreencaptureViewModel
+    @AppStorage("secondScreenAvailable") var secondScreenAvailable = true
+
     
     var body: some View {
         VStack {
@@ -26,17 +28,38 @@ struct ContentView: View {
             }
             
             HStack {
-                Button("Make a area screenshot") {
+                Button(action: {
                     vm.takeScreenshot(for: .area)
-                }
-                .keyboardShortcut(KeyEquivalent("a"), modifiers: .command)
+                }, label: {
+                    Label("Area", systemImage: "rectangle.center.inset.filled.badge.plus")
+                })
                 
-                Button("Make a window screenshot") {
+                Button(action: {
                     vm.takeScreenshot(for: .window)
-                }
+                }, label: {
+                    Label("Window", systemImage: "macwindow")
+                })
                 
-                Button("Make a full screenshot") {
-                    vm.takeScreenshot(for: .full)
+                if secondScreenAvailable {
+                    Button(action: {
+                        vm.takeScreenshot(for: .full1)
+                    }, label: {
+                        Label("Main Screen", systemImage: "macbook.gen2")
+                    })
+                    Button(action: {
+                        vm.takeScreenshot(for: .full2)
+                    }, label: {
+                        Label("2nd Screen", systemImage: "display")
+                    })
+                } else {
+                    Button {
+                        vm.takeScreenshot(for: .full1)
+                    } label: {
+                        HStack {
+                            Image(systemName: "macbook.gen2")
+                            Text("Main Screen")
+                        }
+                    }
                 }
             }
         }

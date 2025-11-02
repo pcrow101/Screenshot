@@ -10,6 +10,7 @@ import SwiftUI
 struct MenubarContentView: View {
     
     @ObservedObject var vm: ScreencaptureViewModel
+    @AppStorage("secondScreenAvailable") var secondScreenAvailable = true
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -49,7 +50,6 @@ struct MenubarContentView: View {
                 }, label: {
                     Label("Area", systemImage: "rectangle.center.inset.filled.badge.plus")
                 })
-                .keyboardShortcut(.defaultAction)
                 
                 Button(action: {
                     vm.takeScreenshot(for: .window)
@@ -57,19 +57,35 @@ struct MenubarContentView: View {
                     Label("Window", systemImage: "macwindow")
                 })
                 
-                Button(action: {
-                    vm.takeScreenshot(for: .full)
-                }, label: {
-                    Label("Full Screen", systemImage: "macbook.gen2")
-                })
+                if secondScreenAvailable {
+                    Button(action: {
+                        vm.takeScreenshot(for: .full1)
+                    }, label: {
+                        Label("Main Screen", systemImage: "macbook.gen2")
+                    })
+                    Button(action: {
+                        vm.takeScreenshot(for: .full2)
+                    }, label: {
+                        Label("2nd Screen", systemImage: "display")
+                    })
+                } else {
+    
+                    Button(action: {
+                        vm.takeScreenshot(for: .full1)
+                    }, label: {
+                        Label("Full Screen", systemImage: "macbook.gen2")
+                    })
+                }
                 
                 SettingsLink()
                     .labelStyle(.iconOnly)
             }
             .frame(maxWidth: .infinity)
+            .fontWidth(.condensed)
+
             
         }
-        .frame(minWidth: 350)
+        .frame(minWidth: 440)
         .padding()
     }
 }

@@ -14,8 +14,12 @@ struct ScreenshotApp: App {
     @AppStorage("menuBarExtraIsInserted") var menuBarExtraIsInserted = true
     
     var body: some Scene {
+        Window("Screenshots", id: "main") {
+            ContentView(vm: vm)
+        }
+        
         MenuBarExtra("Screenshots",
-                     systemImage: "photo.badge.plus",
+                     systemImage: "camera.viewfinder",
                      isInserted: $menuBarExtraIsInserted) {
             MenubarContentView(vm: vm)
         }
