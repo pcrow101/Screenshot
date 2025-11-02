@@ -14,14 +14,17 @@ class ScreencaptureViewModel: ObservableObject {
     @AppStorage("playScreenshotSound") private var playScreenshotSound: Bool = true
     
     enum ScreenshotTypes {
-        case full
+        case full1
+        case full2
         case window
         case area
         
         func processArguments(playSound: Bool) -> [String] {
             switch self {
-                case .full:
-                    return playSound ? ["-c"] : ["-cx"]
+                case .full1:
+                    return playSound ? ["-c"] : ["-cxD1"]
+                case .full2:
+                    return playSound ? ["-c"] : ["-cxD2"]
                 case .window:
                     return playSound ? ["-cw"] : ["-cwx"]
                 case .area:
@@ -39,7 +42,7 @@ class ScreencaptureViewModel: ObservableObject {
         }
         
         KeyboardShortcuts.onKeyUp(for: .screenshotCaptureFull) { [self] in
-            self.takeScreenshot(for: .full)
+            self.takeScreenshot(for: .full1)
         }
         
         KeyboardShortcuts.onKeyUp(for: .screenshotCaptureWindow) { [self] in
