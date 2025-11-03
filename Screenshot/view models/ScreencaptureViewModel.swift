@@ -22,9 +22,9 @@ class ScreencaptureViewModel: ObservableObject {
         func processArguments(playSound: Bool) -> [String] {
             switch self {
                 case .full1:
-                    return playSound ? ["-c"] : ["-cxD1"]
+                    return playSound ? ["-cD1"] : ["-cxD1"]
                 case .full2:
-                    return playSound ? ["-c"] : ["-cxD2"]
+                    return playSound ? ["-cD2"] : ["-cxD2"]
                 case .window:
                     return playSound ? ["-cw"] : ["-cwx"]
                 case .area:
