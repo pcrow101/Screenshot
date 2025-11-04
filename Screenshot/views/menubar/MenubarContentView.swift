@@ -34,8 +34,29 @@ struct MenubarContentView: View {
                             .resizable()
                             .scaledToFit()
                             .shadow(radius: 5)
-                            .onDrag({ NSItemProvider(object: image) })
-                          //  .draggable(image)
+                            .onDrag {
+                                let tmpDir = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+                                let fileURL = tmpDir.appendingPathComponent(UUID().uuidString).appendingPathExtension("png")
+                                
+                                // Convert NSImage to PNG data
+                                func pngData(from nsImage: NSImage) -> Data? {
+                                    guard
+                                        let tiff = nsImage.tiffRepresentation,
+                                        let rep = NSBitmapImageRep(data: tiff),
+                                        let data = rep.representation(using: .png, properties: [:])
+                                    else { return nil }
+                                    return data
+                                }
+                                
+                                if let data = pngData(from: image) {
+                                    try? data.write(to: fileURL, options: .atomic)
+                                    // Provide a file URL
+                                    return NSItemProvider(contentsOf: fileURL) ?? NSItemProvider()
+                                } else {
+                                    // Fallback to in-memory image if conversion failed
+                                    return NSItemProvider(object: image)
+                                }
+                            }
                     }
                 }
             }

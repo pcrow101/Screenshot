@@ -37,7 +37,7 @@ struct ContentView: View {
                                 
                                 if let data = pngData(from: image) {
                                     try? data.write(to: fileURL, options: .atomic)
-                                    // Provide a file URL; OneNote will import the image file
+                                    // Provide a file URL
                                     return NSItemProvider(contentsOf: fileURL) ?? NSItemProvider()
                                 } else {
                                     // Fallback to in-memory image if conversion failed
