@@ -11,6 +11,7 @@ struct MenubarContentView: View {
     
     @ObservedObject var vm: ScreencaptureViewModel
     @AppStorage("secondScreenAvailable") var secondScreenAvailable = true
+    @State private var confirmingClearAll = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -19,10 +20,28 @@ struct MenubarContentView: View {
                     .font(.title2)
                 
                 if !vm.images.isEmpty {
-                    Button("Clear All") {
-                        vm.images = []
+                    if confirmingClearAll {
+                        Button {
+                            vm.removeAll()
+                            confirmingClearAll = false
+                        } label: {
+                            Label("Confirm Delete", systemImage: "trash")
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red)
+                        .onAppear {
+                            // Auto-cancel after 4 seconds if not confirmed
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                                confirmingClearAll = false
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    } else {
+                        Button("Clear All") {
+                            confirmingClearAll = true
+                        }
+                        .frame(maxWidth: .infinity, alignment: .trailing)
                     }
-                    .frame(maxWidth: .infinity, alignment: .trailing)
                 }
             }
             .padding(.bottom, 10)
@@ -30,33 +49,49 @@ struct MenubarContentView: View {
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 75, maximum: 150))]) {
                     ForEach(vm.images.reversed(), id: \.self) { image in
-                        Image(nsImage: image)
-                            .resizable()
-                            .scaledToFit()
-                            .shadow(radius: 5)
-                            .onDrag {
-                                let tmpDir = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
-                                let fileURL = tmpDir.appendingPathComponent(UUID().uuidString).appendingPathExtension("png")
-                                
-                                // Convert NSImage to PNG data
-                                func pngData(from nsImage: NSImage) -> Data? {
-                                    guard
-                                        let tiff = nsImage.tiffRepresentation,
-                                        let rep = NSBitmapImageRep(data: tiff),
-                                        let data = rep.representation(using: .png, properties: [:])
-                                    else { return nil }
-                                    return data
+                        ZStack(alignment: .topTrailing) {
+                            Image(nsImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .shadow(radius: 5)
+                                .contextMenu {
+                                    Button(role: .destructive) {
+                                        vm.delete(image)
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
                                 }
-                                
-                                if let data = pngData(from: image) {
-                                    try? data.write(to: fileURL, options: .atomic)
-                                    // Provide a file URL
-                                    return NSItemProvider(contentsOf: fileURL) ?? NSItemProvider()
-                                } else {
-                                    // Fallback to in-memory image if conversion failed
-                                    return NSItemProvider(object: image)
+                                .onDrag {
+                                    let tmpDir = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+                                    let fileURL = tmpDir.appendingPathComponent(UUID().uuidString).appendingPathExtension("png")
+                                    func pngData(from nsImage: NSImage) -> Data? {
+                                        guard
+                                            let tiff = nsImage.tiffRepresentation,
+                                            let rep = NSBitmapImageRep(data: tiff),
+                                            let data = rep.representation(using: .png, properties: [:])
+                                        else { return nil }
+                                        return data
+                                    }
+                                    if let data = pngData(from: image) {
+                                        try? data.write(to: fileURL, options: .atomic)
+                                        return NSItemProvider(contentsOf: fileURL) ?? NSItemProvider()
+                                    } else {
+                                        return NSItemProvider(object: image)
+                                    }
                                 }
+
+                            Button {
+                                vm.delete(image)
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .symbolRenderingMode(.multicolor)
+                                    .font(.caption)
+                                    .padding(4)
                             }
+                            .buttonStyle(.plain)
+                            .background(.ultraThinMaterial, in: Circle())
+                            .padding(4)
+                        }
                     }
                 }
             }
@@ -114,3 +149,4 @@ struct MenubarContentView: View {
 #Preview {
     MenubarContentView(vm: ScreencaptureViewModel())
 }
+
