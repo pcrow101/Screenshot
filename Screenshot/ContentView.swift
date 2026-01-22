@@ -61,17 +61,9 @@ struct ContentView: View {
             HStack {
                 Text("Your Screenshots")
                     .font(.title2)
-                Spacer()
-                if !vm.images.isEmpty {
-                    Button("Clear All") {
-                        showClearAllConfirmation = true
-                    }
-                }
-            }
 
-            // Presets controls
-            HStack(spacing: 12) {
-                Picker("Size", selection: Binding(get: { selectedPreset }, set: { new in
+                // Presets Picker moved inline with the title
+                Picker("", selection: Binding(get: { selectedPreset }, set: { new in
                     selectedPreset = new
                     if let s = new.size {
                         thumbnailSize = s
@@ -82,8 +74,15 @@ struct ContentView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .frame(maxWidth: 380) // keep the segmented control from taking too much space
+
+                Spacer()
+                if !vm.images.isEmpty {
+                    Button("Clear All") {
+                        showClearAllConfirmation = true
+                    }
+                }
             }
-            .padding(.vertical, 6)
 
             // Thumbnails use the persisted thumbnailSize
             GeometryReader { proxy in
