@@ -52,4 +52,28 @@ class ScreenshotViewModel: ObservableObject {
         self.images.append(image)
         
     }
+    
+    // MARK: - Deletion
+    /// Delete screenshots at the given offsets (use with List.onDelete)
+    func delete(at offsets: IndexSet) {
+        images.remove(atOffsets: offsets)
+    }
+
+    /// Delete a screenshot at a specific index if valid
+    func delete(at index: Int) {
+        guard images.indices.contains(index) else { return }
+        images.remove(at: index)
+    }
+
+    /// Delete the first matching screenshot instance
+    func delete(_ image: NSImage) {
+        if let idx = images.firstIndex(where: { $0 == image }) {
+            images.remove(at: idx)
+        }
+    }
+
+    /// Remove all captured screenshots
+    func removeAll() {
+        images.removeAll()
+    }
 }
